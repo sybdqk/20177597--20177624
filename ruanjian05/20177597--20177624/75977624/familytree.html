@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FamilyTree</title>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="echarts.min.js"></script>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body{
+            height: 100%;
+            width: 100%;
+             background: url("360downloads5c53da61e7bce7552df835e4.jpg")no-repeat;
+            opacity: 0.9;
+            background-size: cover;
+        }
+        #input{
+            border-color: lightblue;
+            border-radius: 10px;
+            background-color: rgba(255,255,255,.1);
+            width:500px;
+            height: 300px;
+            margin: 10px auto;
+
+        }
+        button{
+            width: 100px;
+            border-color: lightblue;
+            border-radius: 10px;
+            background-color: rgba(255,255,255,.1);
+            border-style: outset;
+            font-size: 25px;
+        }
+        #input{
+            font-size: 20px;
+            font-style: italic;
+            color:white;
+        }
+    </style>
+</head>
+<body>
+
+    <div align="center"><label for="input"></label><textarea id="input" placeholder="请输入数据"></textarea></div>
+    <div align="center"><button>生成</button></div>
+    
+
+</body>
+<script >
+    function drawTree(tree_data,x) {
+        var  myChart = echarts.init(document.getElementById(x));//div元素节点的对象
+        myChart.setOption({
+            tooltip : {
+                trigger : 'item',
+                triggerOn : 'none'
+            },
+            series : [ {
+                type : 'tree',
+                name : 'TREE_ECHARTS',
+                data : tree_data,
+                top : '2%',
+                left : '20%',
+                bottom : '30%',
+                right : '20%',
+                symbolSize : 10,
+                label : {
+                    normal : {
+                        position : 'left',
+                        verticalAlign : 'middle',
+                        align : 'right',
+                        fontSize: 25,
+                        color:"white"
+                    }
+                },
+                leaves : {
+                    label : {
+                        position : 'right',
+                        verticalAlign : 'middle',
+                        align : 'top'
+                    }
+                },
+                expandAndCollapse : true ,
+                initialTreeDepth : 10  //展示层级数
+            } ]
+        });
+
+//树绑定事件
+        myChart.on('click', function(params) {
+            var name = params.data.name;//点击的节点的name
+            var value = params.data.value;//点击的节点的value
+
+
+        });
+    }
+
+    $('#input').click(function(){      //清空原本文本框的值
+        $('#input').html('');
+    });
+    $("button").click(getvalue);
+    function getvalue(){
+        var treedata=Array();
+        var i,j,k,l=0;
+        var str=$("#input").val();  //获取输入
+        var arrstr=Array();
+        arrstr=str.split("\n");//数据分行
+        for(i=0;i<arrstr.length;)
+        {
+            for(j=i+1;j<arrstr.length;j++)
+            {
+                if(arrstr[j]=='')
+                {
+                    break;
+                }
+            }  //此时i~j-1为一组数
+            var doctor=[],master=[],bachelor=[]; //存放学生数据
+            for(k=i;k<j;k++)
+            {
+                var d=0,m=0,b=0;
+                if(k==i)
+                {
+                    treedata.push({"name":"",
+                        "children":[{"name":"博士生",
+                            "children":[]},{"name":"硕士生","children":[]},
+                            {"name":"本科生","children":[]}]
+                    });
+                }
+                var item=arrstr[k].split('：');
+                if(item[0].includes("导师")){
+                    treedata[l]["name"]=item[1];
+                }
+                else if(arrstr[k].includes("博士生")){
+
+                    for(d=0;d<doctor.length;d++){
+                        if(arrstr[k].slice(0,5)==doctor[d]["name"]){
+                            var student=item[1];
+                            var students=item[1].split("、");//存放每个学生姓名
+                            for(var x=0;x<students.length;x++){
+                                var studentName=students[x];
+                                student={"name":studentName,"children":[]};
+                                doctor[d]["children"].push(student);
+                            }
+                            break;
+                        }
+                    }
+                    if(d==doctor.length){
+                        var student={"name":arrstr[k].slice(0,5),"children":[]};
+                        doctor.push(student);
+                        student=item[1].split("、");
+
+                        for(var x=0;x<student.length;x++){
+                            var s={"name":student[x],"children":[]};
+                            doctor[d]["children"].push(s);
+                        }
+                    }
+                }
+                else if(item[0].includes("硕士生")){
+                    for(d=0;d<master.length;d++){
+                        if(arrstr[k].slice(0,5)==master[d]["name"]){
+                            var student=item[1];
+                            var students=item[1].split("、");//存放每个学生姓名
+                            for(var x=0;x<students.length;x++){
+                                var studentName=students[x];
+                                student={"name":studentName,"children":[]};
+                                master[d]["children"].push(student);
+                            }
+                            break;
+                        }
+                    }
+                    if(d==master.length){
+                        var student={"name":arrstr[k].slice(0,5),"children":[]};
+                        master.push(student);
+                        student=item[1].split("、");
+                        for(var x=0;x<student.length;x++){
+                            var s={"name":student[x],"children":[]};
+                            master[d]["children"].push(s);
+                        }
+                    }
+                }
+                else{
+                    for(d=0;d<bachelor.length;d++){
+                        if(arrstr[k].slice(0,5)==bachelor[d]["name"]){
+                            var student=item[1];
+                            var students=item[1].split("、");//存放每个学生姓名
+                            for(var x=0;x<students.length;x++){
+                                var studentName=students[x];
+                                student={"name":studentName,"children":[]};
+                                bachelor[d]["children"].push(student);
+                            }
+                            break;
+                        }
+                    }
+                    if(d==bachelor.length){
+                        var student={"name":arrstr[k].slice(0,5),"children":[]};
+                        bachelor.push(student);
+                        student=item[1].split("、");
+                        for(var x=0;x<student.length;x++){
+                            var s={"name":student[x],"children":[]};
+                            bachelor[d]["children"].push(s);
+                        }
+                    }
+                }
+            }
+            treedata[l]["children"][0]["children"]=doctor;
+            treedata[l]["children"][1]["children"]=master;
+            treedata[l]["children"][2]["children"]=bachelor;
+            l=l+1;
+            i=j+1;
+        }
+        for(i=0;i<treedata.length;i++)
+        {
+            var data=[];
+            data[0]=treedata[i];
+            var x=i.toString();
+            $("body").append("<div id='x' style=\"height:900px;\"></div>");
+            $("#x").attr('id',x);
+            data[0]=treedata[i];
+            drawTree(data,x);
+        }
+    }
+</script>
+</html>
